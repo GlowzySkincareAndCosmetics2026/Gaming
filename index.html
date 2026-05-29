@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catch the Stars ⭐</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        .game-container {
+            position: relative;
+            width: 400px;
+            height: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .player {
+            position: absolute;
+            font-size: 40px;
+            bottom: 20px;
+            left: 180px;
+            transition: left 0.1s ease;
+            filter: drop-shadow(0 0 10px gold);
+        }
+
+        .item {
+            position: absolute;
+            font-size: 30px;
+            animation: fall 3s linear forwards;
+        }
+
+        @keyframes fall {
+            from { top: -40px; }
+            to { top: 520px; }
+        }
+
+        .score-board {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            color: white;
+            font-size: 20px;
+            z-index: 10;
+            text-shadow: 0 0 5px black;
+        }
+
+        .score-board span {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .lives {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+        }
+
+        .start-screen, .game-over-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 100;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #ffd700, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p {
+            font-size: 16px;
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 18px;
+            background: linear-gradient(90deg, #ffd700, #ff6b6b);
+            border: none;
+            border-radius: 30px;
+            color: #1a1a2e;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .instructions {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #888;
+        }
+
+        .final-score {
+            font-size: 48px;
+            color: #ffd700;
+            margin: 20px 0;
+        }
+
+        /* Background stars */
+        .bg-star {
+            position: absolute;
+            font-size: 10px;
+            color: white;
+            opacity: 0.3;
+            animation: twinkle 2s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container" id="gameContainer">
+    <div class="score-board">Score: <span id="score">0</span></div>
+    <div class="lives" id="lives">❤️❤️❤️</div>
+    
+    <div class="player" id="player">🦸</div>
+    
+    <!-- Start Screen -->
+    <div class="start-screen" id="startScreen">
+        <h1>⭐ Catch the Stars</h1>
+        <p>Catch good items, avoid bad ones!</p>
+        <button class="btn" onclick="startGame()">Play Game ▶️</button>
+        <div class="instructions">⬅️ Left / Right Arrow keys to move</div>
+    </div>
+    
+    <!-- Game Over Screen -->
+    <div class="game-over-screen hidden" id="gameOverScreen">
+        <h1>Game Over!</h1>
+        <p>Your final score:</p>
+        <div class="final-score" id="finalScore">0</div>
+        <button class="btn" onclick="startGame()">Play Again 🔄</button>
+    </div>
+</div>
+
+<script>
+    const player = document.getElementById('player');
+    const scoreDisplay = document.getElementById('score');
+    const livesDisplay = document.getElementById('lives');
+    const gameContainer = document.getElementById('gameContainer');
+    const startScreen = document.getElementById('startScreen');
+    const gameOverScreen = document.getElementById('gameOverScreen');
+    const finalScoreDisplay = document.getElementById('finalScore');
+
+    let score = 0;
+    let lives = 3;
+    let gameRunning = false;
+    let playerX = 180;
+    let fallingItems = [];
+    let itemId = 0;
+
+    // Items: emoji + points (positive = good, negative = bad)
+    const items = [
+        { emoji: '⭐', points: 10 },
+        { emoji: '💎', points: 20 },
+        { emoji: '🌟', points: 15 },
+        { emoji: '🔮', points: 25 },
+        { emoji: '💀', points: -10 },
+        { emoji: '💣', points: -15 },
+        { emoji: '🦴', points: -10 },
+    ];
+
+    // Create background stars
+    function createBackground() {
+        for (let i = 0; i < 30; i++) {
+            const star = document.createElement('div');
+            star.className = 'bg-star';
+            star.textContent = '✦';
+            star.style.left = Math.random() * 400 + 'px';
+            star.style.top = Math.random() * 500 + 'px';
+            star.style.animationDelay = Math.random() * 2 + 's';
+            gameContainer.appendChild(star);
+        }
+    }
+
+    createBackground();
+
+    // Keyboard controls
+    document.addEventListener('keydown', (e) => {
+        if (!gameRunning) return;
+        
+        if (e.key === 'ArrowLeft' || e.key === 'a') {
+            playerX = Math.max(20, playerX - 30);
+        } else if (e.key === 'ArrowRight' || e.key === 'd') {
+            playerX = Math.min(340, playerX + 30);
+        }
+        player.style.left = playerX + 'px';
+    });
+
+    // Start game
+    function startGame() {
+        score = 0;
+        lives = 3;
+        playerX = 180;
+        gameRunning = true;
+        
+        scoreDisplay.textContent = score;
+        livesDisplay.textContent = '❤️❤️❤️';
+        player.style.left = playerX + 'px';
+        
+        startScreen.classList.add('hidden');
+        gameOverScreen.classList.add('hidden');
+        
+        // Remove old items
+        document.querySelectorAll('.item').forEach(item => item.remove());
+        
+        // Start spawning items
+        spawnItem();
+        
+        // Schedule game over after 60 seconds
+        setTimeout(() => {
+            if (gameRunning) endGame();
+        }, 60000);
+    }
+
+    // Spawn falling item
+    function spawnItem() {
+        if (!gameRunning) return;
+        
+        const itemData = items[Math.floor(Math.random() * items.length)];
+        const item = document.createElement('div');
+        item.className = 'item';
+        item.textContent = itemData.emoji;
+        item.style.left = Math.random() * 360 + 20 + 'px';
+        item.style.animationDuration = (2 + Math.random() * 2) + 's';
+        
+        item.dataset.id = itemId++;
+        item.dataset.points = itemData.points;
+        
+        gameContainer.appendChild(item);
+        fallingItems.push(item);
+        
+        // Remove item after animation
+        setTimeout(() => {
+            if (item.parentNode) {
+                item.remove();
+                fallingItems = fallingItems.filter(i => i !== item);
+            }
+        }, 4000);
+        
+        // Check collision every 50ms
+        const checkCollision = setInterval(() => {
+            if (!gameRunning || !item.parentNode) {
+                clearInterval(checkCollision);
+                return;
+            }
+            
+            const itemRect = item.getBoundingClientRect();
+            const playerRect = player.getBoundingClientRect();
+            
+            if (isColliding(itemRect, playerRect)) {
+                const points = parseInt(item.dataset.points);
+                score += points;
+                scoreDisplay.textContent = score;
+                
+                if (points < 0) {
+                    lives--;
+                    updateLives();
+                    if (lives <= 0) endGame();
+                }
+                
+                item.remove();
+                clearInterval(checkCollision);
+            }
+        }, 50);
+        
+        // Spawn next item (faster as score increases)
+        const spawnDelay = Math.max(500, 1500 - score * 5);
+        setTimeout(spawnItem, spawnDelay);
+    }
+
+    function isColliding(rect1, rect2) {
+        return !(rect1.right < rect2.left || 
+                 rect1.left > rect2.right || 
+                 rect1.bottom < rect2.top || 
+                 rect1.top > rect2.bottom);
+    }
+
+    function updateLives() {
+        let hearts = '';
+        for (let i = 0; i < lives; i++) hearts += '❤️';
+        livesDisplay.textContent = hearts;
+    }
+
+    function endGame() {
+        gameRunning = false;
+        finalScoreDisplay.textContent = score;
+        gameOverScreen.classList.remove('hidden');
+    }
+</script>
+
+</body>
+  </html>
