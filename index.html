@@ -2,220 +2,207 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cute Wordle 🐱</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%}
-body{font-family:'Comic Sans MS',cursive,sans-serif;background:linear-gradient(135deg,#ffe4ec,#e8f4f8);display:flex;justify-content:center;align-items:center;padding:5px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-.app{width:100%;max-width:350px;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 8px 30px rgba(255,182,193,0.5)}
-.hd{background:linear-gradient(90deg,#ffb6c1,#87ceeb);padding:10px;text-align:center}
-.hd h1{color:#fff;font-size:20px;text-shadow:1px 1px 2px rgba(0,0,0,0.2)}
-.hint-box{background:#f5f5f5;padding:8px;text-align:center;border-bottom:2px dashed #ffb6c1}
-.hint-img{width:80px;height:80px;margin:5px auto}
-.hint-text{color:#888;font-size:12px}
-.grd{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:10px}
-.tile{width:100%;aspect-ratio:1;border:2px solid #ddd;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:bold;background:#fff;transition:transform 0.15s}
-.tile.filled{border-color:#ffb6c1}
-.tile.correct{background:#4ade80;border-color:#4ade80;color:#fff;animation:bounce 0.3s}
-.tile.wrong{background:#f87171;border-color:#f87171;color:#fff}
-.tile.close{background:#facc15;border-color:#facc15}
-@keyframes bounce{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
-.msg{padding:8px;text-align:center;font-size:14px;font-weight:bold;min-height:35px}
-.msg.win{color:#4ade80}
-.msg.lose{color:#f87171}
-.btn-row{padding:5px 10px;display:flex;justify-content:center;gap:8px}
-.btn{padding:8px 20px;background:linear-gradient(90deg,#ffb6c1,#ff69b4);border:none;border-radius:15px;color:#fff;font-size:13px;font-weight:bold;cursor:pointer}
-.btn:active{transform:scale(0.95)}
-.kb{padding:8px;background:#eee;display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
-.key{width:28px;height:38px;background:#fff;border:1px solid #ccc;border-radius:5px;font-size:14px;font-weight:bold;color:#333;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.key:active{background:#ffb6c1;color:#fff}
-.key.correct{background:#4ade80;color:#fff;border-color:#4ade80}
-.key.wrong{background:#f87171;color:#fff;border-color:#f87171}
-#ent{min-width:45px}
-#del{min-width:45px}
+body{font-family:sans-serif;background:linear-gradient(135deg,#ffc2d1,#caf0f8);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:10px}
+.game{width:100%;max-width:340px;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 8px 25px rgba(255,105,180,0.3)}
+.header{background:linear-gradient(90deg,#ff8fab,#8ec5fc);padding:12px;text-align:center;color:#fff;font-size:18px;font-weight:bold}
+.picture{background:#f0f0f0;padding:15px;text-align:center}
+.picture svg{width:80px;height:80px}
+.picture p{color:#888;font-size:12px;margin-top:5px}
+.board{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;padding:15px;justify-items:center}
+.tile{width:50px;height:50px;border:2px solid #ddd;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:bold;background:#fff}
+.tile.filled{border-color:#ff8fab}
+.tile.green{background:#4ade80;border-color:#4ade80;color:#fff}
+.tile.yellow{background:#facc15;border-color:#facc15}
+.tile.gray{background:#ccc;border-color:#ccc;color:#fff}
+.message{padding:10px;text-align:center;font-size:14px;font-weight:bold;min-height:40px;color:#333}
+.buttons{padding:5px 10px;display:flex;justify-content:center;gap:10px}
+.buttons button{padding:8px 20px;background:#ff8fab;border:none;border-radius:15px;color:#fff;font-weight:bold;cursor:pointer;font-size:13px}
+.keyboard{display:flex;flex-wrap:wrap;gap:4px;padding:10px;background:#eee;justify-content:center}
+.key{width:30px;height:40px;background:#fff;border:1px solid #bbb;border-radius:5px;font-size:14px;font-weight:bold;color:#333;cursor:pointer}
+.key:active{background:#ff8fab;color:#fff}
+.key.green{background:#4ade80;color:#fff;border-color:#4ade80}
+.key.yellow{background:#facc15;color:#333;border-color:#facc15}
+.key.gray{background:#ccc;color:#fff;border-color:#ccc}
+.key.enter{width:50px}
+.key.back{width:50px}
 </style>
 </head>
 <body>
-<div class="app">
-<div class="hd"><h1>🐱 Cute Wordle 🐱</h1></div>
-<div class="hint-box">
-<div class="hint-img" id="hintImg"></div>
-<div class="hint-text" id="hintTxt">What's this animal?</div>
+<div class="game">
+<div class="header">🐱 Cute Wordle 🐱</div>
+<div class="picture" id="picture"></div>
+<div class="message" id="message">Guess the animal!</div>
+<div class="buttons">
+<button onclick="newGame()">🎲 New</button>
+<button onclick="useHint()">💡 Hint</button>
 </div>
-<div class="grd" id="grid"></div>
-<div class="msg" id="msg">Type the answer!</div>
-<div class="btn-row">
-<button class="btn" onclick="init()">🎲 New</button>
-<button class="btn" onclick="showHint()">💡 Hint</button>
+<div class="board" id="board"></div>
+<div class="keyboard" id="keyboard"></div>
 </div>
-<div class="kb" id="keyboard"></div>
-</div>
+
 <script>
-const data={
-words:[
-{w:'CAT',svg:'<svg viewBox="0 0 100 100"><ellipse cx="50" cy="55" rx="28" ry="32" fill="#ffb6c1"/><polygon points="28,28 38,45 22,42" fill="#ffb6c1"/><polygon points="72,28 62,45 78,42" fill="#ffb6c1"/><circle cx="40" cy="50" r="4" fill="#333"/><circle cx="60" cy="50" r="4" fill="#333"/><ellipse cx="50" cy="56" rx="2" ry="1.5" fill="#e53935"/></svg>'},
-{w:'DOG',svg:'<svg viewBox="0 0 100 100"><ellipse cx="50" cy="55" rx="32" ry="28" fill="#d4a574"/><polygon points="22,35 12,52 30,48" fill="#d4a574"/><polygon points="78,35 88,52 70,48" fill="#d4a574"/><circle cx="40" cy="50" r="5" fill="#333"/><circle cx="60" cy="50" r="5" fill="#333"/><ellipse cx="50" cy="56" rx="3" ry="2" fill="#333"/><path d="M44,65 Q50,70 56,65" stroke="#333" fill="none" stroke-width="2"/></svg>'},
-{w:'SUN',svg:'<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="22" fill="#fbbf24"/><line x1="50" y1="12" x2="50" y2="5" stroke="#fbbf24" stroke-width="4"/><line x1="50" y1="88" x2="50" y2="95" stroke="#fbbf24" stroke-width="4"/><line x1="12" y1="50" x2="5" y2="50" stroke="#fbbf24" stroke-width="4"/><line x1="88" y1="50" x2="95" y2="50" stroke="#fbbf24" stroke-width="4"/></svg>'},
-{w:'FISH',svg:'<svg viewBox="0 0 100 100"><ellipse cx="55" cy="50" rx="28" ry="16" fill="#f87171"/><polygon points="27,50 12,38 12,62" fill="#f87171"/><circle cx="65" cy="47" r="3" fill="#333"/><path d="M70,50 Q78,47 75,53" stroke="#fff" fill="none" stroke-width="1.5"/></svg>'},
-{w:'BEE',svg:'<svg viewBox="0 0 100 100"><ellipse cx="50" cy="52" rx="28" ry="16" fill="#fbbf24"/><line x1="32" y1="44" x2="32" y2="60" stroke="#333" stroke-width="2"/><line x1="50" y1="44" x2="50" y2="60" stroke="#333" stroke-width="2"/><line x1="68" y1="44" x2="68" y2="60" stroke="#333" stroke-width="2"/><circle cx="42" cy="52" r="3" fill="#333"/></svg>'},
-{w:'BEAR',svg:'<svg viewBox="0 0 100 100"><ellipse cx="50" cy="58" rx="32" ry="26" fill="#92400e"/><circle cx="35" cy="38" r="10" fill="#92400e"/><circle cx="65" cy="38" r="10" fill="#92400e"/><circle cx="35" cy="38" r="6" fill="#fcd34d"/><circle cx="65" cy="38" r="6" fill="#fcd34d"/><circle cx="50" cy="52" r="8" fill="#fcd34d"/></svg>'},
-{w:'MOON',svg:'<svg viewBox="0 0 100 100"><path d="M55 12 A38 38 0 1 1 55 88 A26 26 0 1 0 55 12" fill="#fbbf24"/><circle cx="35" cy="35" r="2.5" fill="#fff"/><circle cx="68" cy="52" r="1.5" fill="#fff"/></svg>'},
-{w:'BIRD',svg:'<svg viewBox="0 0 100 100"><ellipse cx="55" cy="50" rx="24" ry="14" fill="#38bdf8"/><polygon points="78,50 92,42 92,58" fill="#38bdf8"/><circle cx="42" cy="48" r="2.5" fill="#333"/></svg>'}
-]
-};
-let state={target:null,cur:'',attempts:0,maxAttempts:6,over:false,hinted:false};
-const grid=document.getElementById('grid');
-const msg=document.getElementById('msg');
-const hintImg=document.getElementById('hintImg');
-const hintTxt=document.getElementById('hintTxt');
-const keyboard=document.getElementById('keyboard');
-let audioCtx;
-function init(){
-if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-state.target=data.words[Math.floor(Math.random()*data.words.length)];
-state.cur='';
-state.attempts=0;
-state.over=false;
-state.hinted=false;
-msg.textContent='Type the answer!';
-msg.className='msg';
-hintImg.innerHTML=state.target.svg;
-hintTxt.textContent="What's this animal?";
-renderGrid();
-renderKeyboard();
-playTone(600,0.05,0.1);
+const levels=[
+{w:'CAT',svg:'<svg viewBox="0 0 100 100"><ellipse cx="50" cy="55" rx="25" ry="30" fill="#ffb6c1"/><polygon points="30,30 20,50 38,45" fill="#ffb6c1"/><polygon points="70,30 80,50 62,45" fill="#ffb6c1"/><circle cx="40" cy="52" r="4" fill="#333"/><circle cx="60" cy="52" r="4" fill="#333"/></svg>'},
+{w:'DOG',svg:'<svg viewBox="0 0 100 100"><ellipse cx="50" cy="55" rx="30" ry="25" fill="#d4a574"/><polygon points="25,40 15,55 35,50" fill="#d4a574"/><polygon points="75,40 85,55 65,50" fill="#d4a574"/><circle cx="40" cy="52" r="4" fill="#333"/><circle cx="60" cy="52" r="4" fill="#333"/></svg>'},
+{w:'SUN',svg:'<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="20" fill="#fbbf24"/><line x1="50" y1="15" x2="50" y2="5" stroke="#fbbf24" stroke-width="4"/><line x1="50" y1="85" x2="50" y2="95" stroke="#fbbf24" stroke-width="4"/><line x1="15" y1="50" x2="5" y2="50" stroke="#fbbf24" stroke-width="4"/><line x1="85" y1="50" x2="95" y2="50" stroke="#fbbf24" stroke-width="4"/></svg>'},
+{w:'FISH',svg:'<svg viewBox="0 0 100 100"><ellipse cx="55" cy="50" rx="25" ry="15" fill="#f87171"/><polygon points="30,50 15,38 15,62" fill="#f87171"/><circle cx="65" cy="48" r="3" fill="#333"/></svg>'},
+{w:'BEE',svg:'<svg viewBox="0 0 100 100"><ellipse cx="50" cy="50" rx="25" ry="15" fill="#fbbf24"/><line x1="35" y1="42" x2="35" y2="58" stroke="#333" stroke-width="2"/><line x1="50" y1="42" x2="50" y2="58" stroke="#333" stroke-width="2"/><line x1="65" y1="42" x2="65" y2="58" stroke="#333" stroke-width="2"/><circle cx="40" cy="50" r="3" fill="#333"/></svg>'},
+{w:'BEAR',svg:'<svg viewBox="0 0 100 100"><ellipse cx="50" cy="58" rx="28" ry="22" fill="#92400e"/><circle cx="35" cy="38" r="8" fill="#92400e"/><circle cx="65" cy="38" r="8" fill="#92400e"/><circle cx="35" cy="38" r="5" fill="#fef3c7"/><circle cx="65" cy="38" r="5" fill="#fef3c7"/></svg>'}
+];
+
+let game={target:null,current:'',row:0,over:false,usedHint:false};
+
+function playSound(freq,dur,vol){
+try{
+let ctx=new(window.AudioContext||window.webkitAudioContext)();
+let osc=ctx.createOscillator();
+let gain=ctx.createGain();
+osc.type='sine';
+osc.frequency.value=freq;
+gain.gain.value=vol;
+gain.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+dur);
+osc.connect(gain);
+gain.connect(ctx.destination);
+osc.start();
+osc.stop(ctx.currentTime+dur);
+}catch(e){}
 }
-function renderGrid(){
-grid.innerHTML='';
+
+function newGame(){
+game.target=levels[Math.floor(Math.random()*levels.length)];
+game.current='';
+game.row=0;
+game.over=false;
+game.usedHint=false;
+document.getElementById('picture').innerHTML=game.target.svg+'<p>What animal?</p>';
+document.getElementById('message').textContent='Guess the animal!';
+document.getElementById('message').style.color='#333';
+makeBoard();
+makeKeyboard();
+playSound(600,0.1,0.1);
+}
+
+function makeBoard(){
+let board=document.getElementById('board');
+board.innerHTML='';
 for(let i=0;i<30;i++){
 let tile=document.createElement('div');
 tile.className='tile';
 tile.id='tile'+i;
-grid.appendChild(tile);
+board.appendChild(tile);
 }
 }
-function renderKeyboard(){
-keyboard.innerHTML='';
-const rows=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];
-rows.forEach((row,ri)=>{
-if(ri===2){
+
+function makeKeyboard(){
+let kb=document.getElementById('keyboard');
+kb.innerHTML='';
+let rows=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];
+rows.forEach((r,i)=>{
+r.split('').forEach(l=>{
 let btn=document.createElement('button');
 btn.className='key';
-btn.id='ent';
-btn.textContent='ENTER';
-btn.onclick=submitWord;
-keyboard.appendChild(btn);
-}
-row.split('').forEach(letter=>{
-let btn=document.createElement('button');
-btn.className='key';
-btn.id='key'+letter;
-btn.textContent=letter;
-btn.onclick=()=>typeLetter(letter);
-keyboard.appendChild(btn);
+btn.textContent=l;
+btn.onclick=function(){typeKey(l)};
+kb.appendChild(btn);
 });
-if(ri===2){
-let btn=document.createElement('button');
-btn.className='key';
-btn.id='del';
-btn.textContent='⌫';
-btn.onclick=deleteLetter;
-keyboard.appendChild(btn);
+if(i===0){
+let ent=document.createElement('button');
+ent.className='key enter';
+ent.textContent='ENTER';
+ent.onclick=submit;
+kb.appendChild(ent);
+}
+if(i===1){
+let del=document.createElement('button');
+del.className='key back';
+del.textContent='⌫';
+del.onclick=deleteKey;
+kb.appendChild(del);
 }
 });
 }
-function typeLetter(l){
-if(state.over||state.cur.length>=5)return;
-state.cur+=l;
-playTone(600,0.05,0.1);
+
+function typeKey(letter){
+if(game.over||game.current.length>=5)return;
+game.current+=letter;
+playSound(600,0.05,0.08);
 updateTiles();
 }
-function deleteLetter(){
-if(state.over||state.cur.length===0)return;
-state.cur=state.cur.slice(0,-1);
-playTone(500,0.05,0.1);
+
+function deleteKey(){
+if(game.over||game.current.length===0)return;
+game.current=game.current.slice(0,-1);
+playSound(400,0.05,0.08);
 updateTiles();
 }
+
 function updateTiles(){
 for(let i=0;i<5;i++){
-let tile=document.getElementById('tile'+(state.attempts*5+i));
-tile.textContent=state.cur[i]||'';
-tile.className='tile'+(state.cur[i]?' filled':'');
+let tile=document.getElementById('tile'+(game.row*5+i));
+tile.textContent=game.current[i]||'';
+tile.className='tile'+(game.current[i]?' filled':'');
 }
 }
-function submitWord(){
-if(state.over||state.cur.length!==5)return;
-let guess=state.cur;
-let target=state.target.w;
-let results=[];
+
+function submit(){
+if(game.over||game.current.length!==5)return;
+let guess=game.current;
+let target=game.target.w;
+let result=[];
 for(let i=0;i<5;i++){
-if(guess[i]===target[i])results[i]='correct';
-else if(target.includes(guess[i]))results[i]='close';
-else results[i]='wrong';
+if(guess[i]===target[i])result[i]='green';
+else if(target.includes(guess[i]))result[i]='yellow';
+else result[i]='gray';
 }
 for(let i=0;i<5;i++){
-let tile=document.getElementById('tile'+(state.attempts*5+i));
-let key=document.getElementById('key'+guess[i]);
+let tile=document.getElementById('tile'+(game.row*5+i));
+let key=document.querySelector('.key[textContent="'+guess[i]+'"]');
 setTimeout(()=>{
-tile.className='tile '+results[i];
-if(results[i]==='correct')playTone(800,0.15);
-else if(results[i]==='close')playTone(600,0.15);
-else playTone(300,0.2);
-if(key){
-key.classList.remove('wrong','close');
-key.classList.add(results[i]);
-}
-},i*100);
+tile.className='tile '+result[i];
+if(result[i]==='green')playSound(800,0.15,0.15);
+else if(result[i]==='yellow')playSound(500,0.15,0.12);
+else playSound(200,0.2,0.12);
+if(key)key.className='key '+result[i];
+},i*150);
 }
 setTimeout(()=>{
 if(guess===target){
-state.over=true;
-playTone(523,0.15);setTimeout(()=>playTone(659,0.15),100);setTimeout(()=>playTone(784,0.15),200);setTimeout(()=>playTone(1047,0.25),300);
-msg.textContent='🎉 You Won!';
-msg.className='msg win';
-hintTxt.textContent='It was '+target+'!';
+game.over=true;
+playSound(523,0.12,0.15);setTimeout(()=>playSound(659,0.12,0.15),100);setTimeout(()=>playSound(784,0.12,0.15),200);
+document.getElementById('message').textContent='🎉 Correct! It was '+target+'!';
+document.getElementById('message').style.color='#4ade80';
 }else{
-state.attempts++;
-if(state.attempts>=state.maxAttempts){
-state.over=true;
-playTone(400,0.25);setTimeout(()=>playTone(300,0.25),200);setTimeout(()=>playTone(200,0.35),400);
-msg.textContent='Answer: '+target;
-msg.className='msg lose';
-hintTxt.textContent='The answer was '+target;
+game.row++;
+if(game.row>=6){
+game.over=true;
+playSound(300,0.3,0.15);setTimeout(()=>playSound(200,0.4,0.15),300);
+document.getElementById('message').textContent='😢 Answer: '+target;
+document.getElementById('message').style.color='#f87171';
 }else{
-state.cur='';
+game.current='';
 }
 }
-},600);
+},800);
 }
-function showHint(){
-if(state.hinted||state.over)return;
-state.hinted=true;
-hintTxt.textContent='The answer starts with '+state.target.w[0];
-playTone(800,0.15);
+
+function useHint(){
+if(game.usedHint||game.over)return;
+game.usedHint=true;
+document.getElementById('message').textContent='Hint: Starts with '+game.target.w[0];
+playSound(800,0.15,0.15);
 }
-function playTone(freq,duration,volume){
-if(!audioCtx)return;
-try{
-let osc=audioCtx.createOscillator();
-let gain=audioCtx.createGain();
-osc.type='sine';
-osc.frequency.value=freq;
-gain.gain.setValueAtTime(volume,audioCtx.currentTime);
-gain.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+duration);
-osc.connect(gain);
-gain.connect(audioCtx.destination);
-osc.start();
-osc.stop(audioCtx.currentTime+duration);
-}catch(e){}
-}
-document.addEventListener('keydown',e=>{
-if(e.key==='Enter')submitWord();
-else if(e.key==='Backspace')deleteLetter();
-else if(/^[a-zA-Z]$/.test(e.key))typeLetter(e.key.toUpperCase());
+
+document.addEventListener('keydown',function(e){
+if(e.key==='Enter')submit();
+else if(e.key==='Backspace')deleteKey();
+else if(/^[a-zA-Z]$/.test(e.key))typeKey(e.key.toUpperCase());
 });
-init();
+
+newGame();
 </script>
 </div>
 </body>
