@@ -5,372 +5,108 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catch the Stars ⭐</title>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            font-family: Arial, sans-serif;
-            overflow: hidden;
-            touch-action: none;
-        }
-
-        .game-container {
-            position: relative;
-            width: 350px;
-            height: 450px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .score-board {
-            position: absolute;
-            top: 10px;
-            left: 15px;
-            color: white;
-            font-size: 18px;
-            z-index: 10;
-            text-shadow: 0 0 5px black;
-        }
-
-        .score-board span {
-            color: #ffd700;
-            font-weight: bold;
-            font-size: 22px;
-        }
-
-        .lives {
-            position: absolute;
-            top: 12px;
-            right: 15px;
-            font-size: 20px;
-        }
-
-        .player {
-            position: absolute;
-            font-size: 42px;
-            bottom: 25px;
-            left: 154px;
-            transition: left 0.08s linear;
-            filter: drop-shadow(0 0 15px gold);
-            z-index: 5;
-        }
-
-        .item {
-            position: absolute;
-            font-size: 32px;
-            top: -40px;
-            z-index: 4;
-        }
-
-        .start-screen, .game-over-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            z-index: 50;
-            text-align: center;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #0f0c29; min-height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; touch-action: none; }
+        .game { width: 100%; max-width: 380px; height: 100vh; max-height: 650px; background: linear-gradient(180deg, #1a1a3e, #0d0d2b); border-radius: 20px; position: relative; overflow: hidden; border: 3px solid rgba(255,255,255,0.1); box-shadow: 0 0 40px rgba(100,100,255,0.3); }
+        .hud { position: absolute; top: 0; left: 0; right: 0; padding: 12px; display: flex; justify-content: space-between; z-index: 10; background: rgba(0,0,0,0.5); }
+        .score { color: #fff; font-size: 16px; }
+        .score span { color: #ffd700; font-size: 22px; font-weight: bold; }
+        .lives { font-size: 18px; }
+        .level-tag { color: #00ff88; font-size: 12px; background: rgba(0,255,136,0.2); padding: 4px 10px; border-radius: 10px; }
+        .timer { position: absolute; top: 50px; left: 12px; right: 12px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 3px; }
+        .timer-bar { height: 100%; background: linear-gradient(90deg, #00ff88, #00ccff); width: 100%; transition: width 0.3s; }
+        .player { position: absolute; font-size: 44px; bottom: 70px; left: 50%; transform: translateX(-50%); filter: drop-shadow(0 0 15px gold); }
+        .player.hit { animation: shake 0.3s; }
+        @keyframes shake { 0%, 100% { transform: translateX(-50%) rotate(0); } 25% { transform: translateX(-50%) rotate(-10deg); } 75% { transform: translateX(-50%) rotate(10deg); } }
+        .item { position: absolute; font-size: 32px; top: -40px; }
+        .item.good { filter: drop-shadow(0 0 12px gold); }
+        .item.bad { filter: drop-shadow(0 0 12px red); }
+        .score-pop { position: absolute; font-size: 22px; font-weight: bold; pointer-events: none; animation: popUp 0.7s forwards; }
+        .score-pop.pos { color: #00ff88; }
+        .score-pop.neg { color: #ff4444; }
+        @keyframes popUp { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.3) translateY(-40px); } }
+        .screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 50; text-align: center; padding: 20px; background: rgba(0,0,0,0.92); }
         .hidden { display: none !important; }
-
-        h1 {
-            font-size: 28px;
-            margin: 10px 0;
-            background: linear-gradient(90deg, #ffd700, #ff6b6b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .btn {
-            padding: 12px 35px;
-            font-size: 18px;
-            background: linear-gradient(90deg, #ffd700, #ffaa00);
-            border: none;
-            border-radius: 25px;
-            color: #1a1a2e;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 15px;
-        }
-
+        .title { font-size: 26px; background: linear-gradient(90deg, #ffd700, #ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 5px; }
+        .sub { color: #888; font-size: 13px; margin-bottom: 15px; }
+        .emojis { font-size: 30px; margin: 10px; }
+        .btn { padding: 13px 30px; font-size: 17px; font-weight: bold; background: linear-gradient(90deg, #ffd700, #ffaa00); border: none; border-radius: 25px; color: #1a1a2e; cursor: pointer; margin: 8px; }
         .btn:active { transform: scale(0.95); }
-
-        .final-score {
-            font-size: 50px;
-            color: #ffd700;
-            margin: 10px 0;
-        }
-
-        /* Movement Buttons */
-        .controls {
-            position: absolute;
-            bottom: 10px;
-            left: 0;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            padding: 0 20px;
-            box-sizing: border-box;
-            z-index: 20;
-        }
-
-        .control-btn {
-            width: 70px;
-            height: 50px;
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.4);
-            border-radius: 15px;
-            font-size: 28px;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            user-select: none;
-        }
-
-        .control-btn:active {
-            background: rgba(255, 215, 0, 0.5);
-            transform: scale(0.95);
-        }
-
-        /* Stars background */
-        .bg-star {
-            position: absolute;
-            color: white;
-            opacity: 0.4;
-            font-size: 12px;
-            animation: twinkle 1.5s infinite ease-in-out;
-        }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.2; }
-            50% { opacity: 0.7; }
-        }
-
-        .instructions {
-            font-size: 14px;
-            color: #ccc;
-            margin-top: 15px;
-        }
+        .btn2 { background: linear-gradient(90deg, #555, #333); color: #fff; }
+        .final { font-size: 50px; color: #ffd700; text-shadow: 0 0 25px gold; }
+        .high { color: #00ff88; font-size: 16px; }
+        .controls { position: absolute; bottom: 12px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 20px; z-index: 20; }
+        .ctrl { width: 70px; height: 50px; background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.3); border-radius: 12px; font-size: 24px; color: #fff; display: flex; align-items: center; justify-content: center; }
+        .ctrl:active { background: rgba(255,215,0,0.4); }
     </style>
 </head>
 <body>
-
-<div class="game-container" id="gameContainer" tabindex="0">
-    <div class="score-board">Score: <span id="score">0</span></div>
-    <div class="lives" id="lives">❤️❤️❤️</div>
-    
+<div class="game" id="game">
+    <div class="hud">
+        <div class="score">Score: <span id="scoreDisp">0</span></div>
+        <div class="level-tag" id="levelTag">Level 1</div>
+        <div class="lives" id="livesDisp">❤️❤️❤️</div>
+    </div>
+    <div class="timer"><div class="timer-bar" id="timerBar"></div></div>
     <div class="player" id="player">🦸</div>
-    
-    <!-- Start Screen -->
-    <div class="start-screen" id="startScreen">
-        <h1>⭐ Catch the Stars</h1>
-        <p style="color:#aaa;margin:5px;">Catch good items, avoid bad ones!</p>
-        <div style="font-size:30px;margin:10px;">⭐💎🌟 vs 💀💣🦴</div>
-        <button class="btn" onclick="startGame()">PLAY ▶️</button>
-        <p class="instructions">Use ← → arrows or buttons below</p>
-    </div>
-    
-    <!-- Game Over Screen -->
-    <div class="game-over-screen hidden" id="gameOverScreen">
-        <h1>Game Over!</h1>
-        <p style="color:#aaa;">Final Score:</p>
-        <div class="final-score" id="finalScore">0</div>
-        <button class="btn" onclick="startGame()">PLAY AGAIN 🔄</button>
-    </div>
-
-    <!-- On-screen controls -->
     <div class="controls" id="controls">
-        <div class="control-btn" ontouchstart="moveLeft()" onmousedown="moveLeft()">⬅️</div>
-        <div class="control-btn" ontouchstart="moveRight()" onmousedown="moveRight()">➡️</div>
+        <div class="ctrl" ontouchstart="L()" onmousedown="L()">⬅️</div>
+        <div class="ctrl" ontouchstart="R()" onmousedown="R()">➡️</div>
+    </div>
+    <div class="screen" id="startScr">
+        <div class="title">⭐ Catch the Stars</div>
+        <div class="sub">Catch good, avoid bad!</div>
+        <div class="emojis">⭐💎🌟 vs 💀💣👻</div>
+        <button class="btn" onclick="startG()">PLAY ▶️</button>
+    </div>
+    <div class="screen hidden" id="pauseScr">
+        <div class="title">⏸️ Paused</div>
+        <button class="btn" onclick="resume()">Resume ▶️</button>
+        <button class="btn btn2" onclick="quit()">Quit</button>
+    </div>
+    <div class="screen hidden" id="overScr">
+        <div class="title">🎮 Game Over!</div>
+        <div class="sub">Level <span id="finLev">1</span></div>
+        <div class="final" id="finScr">0</div>
+        <div class="high" id="hiScr">Best: 0</div>
+        <button class="btn btn2" onclick="menu()">Menu</button>
+        <button class="btn" onclick="restart()">Replay</button>
+    </div>
+    <div class="screen hidden" id="winScr">
+        <div class="title">🎉 Complete!</div>
+        <div class="final" id="winScr2">0</div>
+        <button class="btn" onclick="nextLvl()">Next ▶️</button>
+        <button class="btn btn2" onclick="menu()">Menu</button>
     </div>
 </div>
-
 <script>
-    const player = document.getElementById('player');
-    const scoreDisplay = document.getElementById('score');
-    const livesDisplay = document.getElementById('lives');
-    const gameContainer = document.getElementById('gameContainer');
-    const startScreen = document.getElementById('startScreen');
-    const gameOverScreen = document.getElementById('gameOverScreen');
-    const finalScoreDisplay = document.getElementById('finalScore');
-    const controlsDiv = document.getElementById('controls');
-
-    let score = 0;
-    let lives = 3;
-    let playerX = 154;
-    let gameRunning = false;
-    let moveSpeed = 25;
-    let keys = {};
-
-    // Items: emoji + points
-    const goodItems = ['⭐', '💎', '🌟', '🔮', '🍀'];
-    const badItems = ['💀', '💣', '🦴', '👻'];
-
-    // Create background stars
-    for (let i = 0; i < 25; i++) {
-        const star = document.createElement('div');
-        star.className = 'bg-star';
-        star.textContent = '✦';
-        star.style.left = Math.random() * 340 + 'px';
-        star.style.top = Math.random() * 440 + 'px';
-        star.style.animationDelay = Math.random() * 1.5 + 's';
-        gameContainer.appendChild(star);
-    }
-
-    // Hide controls initially
-    controlsDiv.classList.add('hidden');
-
-    // Keyboard input
-    document.addEventListener('keydown', (e) => {
-        keys[e.key] = true;
-    });
-
-    document.addEventListener('keyup', (e) => {
-        keys[e.key] = false;
-    });
-
-    // Game loop for movement
-    function gameLoop() {
-        if (!gameRunning) return;
-
-        if (keys['ArrowLeft'] || keys['a'] || keys['A']) {
-            playerX = Math.max(15, playerX - moveSpeed);
-        }
-        if (keys['ArrowRight'] || keys['d'] || keys['D']) {
-            playerX = Math.min(270, playerX + moveSpeed);
-        }
-        
-        player.style.left = playerX + 'px';
-        requestAnimationFrame(gameLoop);
-    }
-
-    // Button controls
-    function moveLeft() {
-        if (!gameRunning) return;
-        playerX = Math.max(15, playerX - moveSpeed);
-        player.style.left = playerX + 'px';
-    }
-
-    function moveRight() {
-        if (!gameRunning) return;
-        playerX = Math.min(270, playerX + moveSpeed);
-        player.style.left = playerX + 'px';
-    }
-
-    // Start game
-    function startGame() {
-        score = 0;
-        lives = 3;
-        playerX = 154;
-        gameRunning = true;
-
-        scoreDisplay.textContent = '0';
-        livesDisplay.textContent = '❤️❤️❤️';
-        player.style.left = '154px';
-
-        // Clear old items
-        document.querySelectorAll('.item').forEach(el => el.remove());
-
-        startScreen.classList.add('hidden');
-        gameOverScreen.classList.add('hidden');
-        controlsDiv.classList.remove('hidden');
-
-        // Start loops
-        gameLoop();
-        spawnItem();
-    }
-
-    // Spawn items
-    function spawnItem() {
-        if (!gameRunning) return;
-
-        const isGood = Math.random() > 0.3;
-        const list = isGood ? goodItems : badItems;
-        const emoji = list[Math.floor(Math.random() * list.length)];
-        const points = isGood ? (emoji === '💎' ? 25 : emoji === '🔮' ? 20 : 10) : -10;
-
-        const item = document.createElement('div');
-        item.className = 'item';
-        item.textContent = emoji;
-        item.dataset.points = points;
-        item.style.left = Math.random() * 300 + 20 + 'px';
-        
-        const speed = 2.5 + Math.random() * 1.5;
-        item.style.transition = `top ${speed}s linear`;
-        
-        gameContainer.appendChild(item);
-        
-        // Trigger animation
-        setTimeout(() => item.style.top = '480px', 10);
-
-        // Collision check & removal
-        const checkInterval = setInterval(() => {
-            if (!gameRunning || !item.parentNode) {
-                clearInterval(checkInterval);
-                return;
-            }
-
-            const itemRect = item.getBoundingClientRect();
-            const playerRect = player.getBoundingClientRect();
-
-            if (itemRect.bottom >= playerRect.top && 
-                itemRect.top <= playerRect.bottom &&
-                itemRect.right >= playerRect.left && 
-                itemRect.left <= playerRect.right) {
-                
-                const pts = parseInt(item.dataset.points);
-                score += pts;
-                scoreDisplay.textContent = score;
-
-                if (pts < 0) {
-                    lives--;
-                    updateLives();
-                    if (lives <= 0) endGame();
-                }
-
-                item.remove();
-                clearInterval(checkInterval);
-            }
-
-            // Item fell off screen
-            if (itemRect.top > 480) {
-                item.remove();
-                clearInterval(checkInterval);
-            }
-        }, 30);
-
-        // Next spawn
-        const delay = Math.max(400, 1000 - score * 3);
-        setTimeout(spawnItem, delay);
-    }
-
-    function updateLives() {
-        livesDisplay.textContent = '❤️'.repeat(lives);
-    }
-
-    function endGame() {
-        gameRunning = false;
-        controlsDiv.classList.add('hidden');
-        finalScoreDisplay.textContent = score;
-        gameOverScreen.classList.remove('hidden');
-    }
+const S = { ctx: null, init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); if (this.ctx.state === 'suspended') this.ctx.resume(); }, p(f, d, v = 0.2, t = 'sine') { if (!this.ctx) return; let o = this.ctx.createOscillator(), g = this.ctx.createGain(); o.type = t; o.frequency.value = f; g.gain.setValueAtTime(v, this.ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + d); o.connect(g); g.connect(this.ctx.destination); o.start(); o.stop(this.ctx.currentTime + d); }, collect() { this.p(880, 0.08); setTimeout(() => this.p(1100, 0.08), 50); }, hit() { this.p(200, 0.25, 0.15, 'square'); }, win() { [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => this.p(f, 0.15), i * 120)); }, lose() { [400, 300, 200].forEach((f, i) => setTimeout(() => this.p(f, 0.3, 0.1, 'sawtooth'), i * 180)); } };
+let G = { s: 0, l: 3, lvl: 1, t: 30, tt: 30, x: 50, r: false, p: false, i: [], hs: [0, 0, 0, 0, 0, 0] };
+const cf = { 1: { t: 30, d: 900, s: 3, b: 0.25 }, 2: { t: 45, d: 800, s: 3.5, b: 0.3 }, 3: { t: 60, d: 700, s: 4, b: 0.35 }, 4: { t: 50, d: 600, s: 4.5, b: 0.4 }, 5: { t: 60, d: 500, s: 5, b: 0.4 }, 6: { t: 90, d: 400, s: 5.5, b: 0.45 } };
+const gI = [{e:'⭐',p:10}, {e:'💎',p:25}, {e:'🌟',p:15}, {e:'🔮',p:20}, {e:'💰',p:50}];
+const bI = [{e:'💀',p:-10}, {e:'💣',p:-15}, {e:'👻',p:-10}, {e:'🦴',p:-10}];
+const pe = document.getElementById('player'), sd = document.getElementById('scoreDisp'), ld = document.getElementById('levelTag'), lid = document.getElementById('livesDisp'), tb = document.getElementById('timerBar');
+const ss = document.getElementById('startScr'), ps = document.getElementById('pauseScr'), os = document.getElementById('overScr'), ws = document.getElementById('winScr');
+let k = {};
+document.addEventListener('keydown', e => k[e.key] = true);
+document.addEventListener('keyup', e => k[e.key] = false);
+function L() { if (G.r && !G.p) G.x = Math.max(15, G.x - 25); pe.style.left = G.x + 'px'; }
+function R() { if (G.r && !G.p) G.x = Math.min(280, G.x + 25); pe.style.left = G.x + 'px'; }
+function loop() { if (!G.r || G.p) return; if (k['ArrowLeft'] || k['a']) L(); if (k['ArrowRight'] || k['d']) R(); requestAnimationFrame(loop); }
+function startG() { S.init(); G.s = 0; G.l = 3; G.t = cf[G.lvl].t; G.tt = cf[G.lvl].t; G.x = 50; G.r = true; G.p = false; sd.innerText = '0'; ld.innerText = 'Level ' + G.lvl; lid.innerText = '❤️❤️❤️'; pe.style.left = '50%'; document.querySelectorAll('.item, .score-pop').forEach(e => e.remove()); ss.classList.add('hidden'); os.classList.add('hidden'); ws.classList.add('hidden'); requestAnimationFrame(loop); spawn(); timer(); }
+function spawn() { if (!G.r || G.p) return; let c = cf[G.lfx], isG = Math.random() > c.b, l = isG ? gI : bI, it = l[Math.floor(Math.random() * l.length)], el = document.createElement('div'); el.className = 'item ' + (isG ? 'good' : 'bad'); el.innerText = it.e; el.dataset.p = it.p; el.style.left = Math.random() * 320 + 20 + 'px'; document.getElementById('game').appendChild(el); let spd = c.s; function fall() { if (!G.r || G.p) return; let t = parseFloat(el.style.top || -40) + spd; el.style.top = t + 'px'; if (t > 580) { el.remove(); return; } let pr = pe.getBoundingClientRect(), ir = el.getBoundingClientRect(); if (ir.bottom > pr.top && ir.top < pr.bottom && ir.right > pr.left && ir.left < pr.right) { let pts = parseInt(el.dataset.p); G.s += pts; sd.innerText = G.s; showPop(ir.left, ir.top, pts); if (pts > 0) S.collect(); else { G.l--; lid.innerText = '❤️'.repeat(G.l); pe.classList.add('hit'); setTimeout(() => pe.classList.remove('hit'), 300); S.hit(); if (G.l <= 0) endG(); } el.remove(); } else requestAnimationFrame(fall); } requestAnimationFrame(fall); setTimeout(spawn, c.d); }
+function showPop(x, y, pts) { let p = document.createElement('div'); p.className = 'score-pop ' + (pts > 0 ? 'pos' : 'neg'); p.innerText = pts > 0 ? '+' + pts : pts; p.style.left = x + 'px'; p.style.top = y + 'px'; document.getElementById('game').appendChild(p); setTimeout(() => p.remove(), 700); }
+function timer() { if (!G.r || G.p) return; G.t -= 0.1; tb.style.width = (G.t / G.tt * 100) + '%'; if (G.t <= 0) win(); else setTimeout(timer, 100); }
+function endG() { G.r = false; S.lose(); document.getElementById('finScr').innerText = G.s; document.getElementById('finLev').innerText = G.lvl; if (G.s > G.hs[G.lvl - 1]) G.hs[G.lvl - 1] = G.s; document.getElementById('hiScr').innerText = 'Best: ' + G.hs[G.lvl - 1]; os.classList.remove('hidden'); }
+function win() { G.r = false; S.win(); if (G.s > G.hs[G.lvl - 1]) G.hs[G.lvl - 1] = G.s; document.getElementById('winScr2').innerText = G.s; ws.classList.remove('hidden'); }
+function resume() { G.p = false; ps.classList.add('hidden'); loop(); timer(); spawn(); }
+function quit() { G.r = false; G.p = false; ps.classList.add('hidden'); ss.classList.remove('hidden'); }
+function menu() { G.r = false; G.p = false; ss.classList.remove('hidden'); os.classList.add('hidden'); ws.classList.add('hidden'); }
+function restart() { startG(); }
+function nextLvl() { G.lvl = Math.min(6, G.lvl + 1); G.t = cf[G.lvl].t; startG(); }
+function togglePause() { if (!G.r) return; if (G.p) resume(); else { G.p = true; ps.classList.remove('hidden'); } }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') togglePause(); });
 </script>
-
+</div>
 </body>
 </html>
