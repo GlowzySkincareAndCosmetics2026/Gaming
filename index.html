@@ -13,46 +13,28 @@
             align-items: center;
             min-height: 100vh;
             background: linear-gradient(135deg, #1a1a2e, #16213e);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Arial, sans-serif;
             overflow: hidden;
+            touch-action: none;
         }
 
         .game-container {
             position: relative;
-            width: 400px;
-            height: 500px;
-            background: rgba(255, 255, 255, 0.1);
+            width: 350px;
+            height: 450px;
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .player {
-            position: absolute;
-            font-size: 40px;
-            bottom: 20px;
-            left: 180px;
-            transition: left 0.1s ease;
-            filter: drop-shadow(0 0 10px gold);
-        }
-
-        .item {
-            position: absolute;
-            font-size: 30px;
-            animation: fall 3s linear forwards;
-        }
-
-        @keyframes fall {
-            from { top: -40px; }
-            to { top: 520px; }
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
 
         .score-board {
             position: absolute;
-            top: 15px;
+            top: 10px;
             left: 15px;
             color: white;
-            font-size: 20px;
+            font-size: 18px;
             z-index: 10;
             text-shadow: 0 0 5px black;
         }
@@ -60,13 +42,31 @@
         .score-board span {
             color: #ffd700;
             font-weight: bold;
+            font-size: 22px;
         }
 
         .lives {
             position: absolute;
-            top: 15px;
+            top: 12px;
             right: 15px;
-            font-size: 24px;
+            font-size: 20px;
+        }
+
+        .player {
+            position: absolute;
+            font-size: 42px;
+            bottom: 25px;
+            left: 154px;
+            transition: left 0.08s linear;
+            filter: drop-shadow(0 0 15px gold);
+            z-index: 5;
+        }
+
+        .item {
+            position: absolute;
+            font-size: 32px;
+            top: -40px;
+            z-index: 4;
         }
 
         .start-screen, .game-over-screen {
@@ -75,81 +75,103 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.9);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             color: white;
-            z-index: 100;
+            z-index: 50;
             text-align: center;
         }
 
-        .hidden {
-            display: none;
-        }
+        .hidden { display: none !important; }
 
         h1 {
-            font-size: 36px;
-            margin-bottom: 10px;
+            font-size: 28px;
+            margin: 10px 0;
             background: linear-gradient(90deg, #ffd700, #ff6b6b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        p {
-            font-size: 16px;
-            color: #aaa;
-            margin-bottom: 30px;
-        }
-
         .btn {
-            padding: 15px 40px;
+            padding: 12px 35px;
             font-size: 18px;
-            background: linear-gradient(90deg, #ffd700, #ff6b6b);
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
             border: none;
-            border-radius: 30px;
+            border-radius: 25px;
             color: #1a1a2e;
             font-weight: bold;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 15px;
         }
 
-        .btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-        }
-
-        .instructions {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #888;
-        }
+        .btn:active { transform: scale(0.95); }
 
         .final-score {
-            font-size: 48px;
+            font-size: 50px;
             color: #ffd700;
-            margin: 20px 0;
+            margin: 10px 0;
         }
 
-        /* Background stars */
+        /* Movement Buttons */
+        .controls {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-sizing: border-box;
+            z-index: 20;
+        }
+
+        .control-btn {
+            width: 70px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 15px;
+            font-size: 28px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+
+        .control-btn:active {
+            background: rgba(255, 215, 0, 0.5);
+            transform: scale(0.95);
+        }
+
+        /* Stars background */
         .bg-star {
             position: absolute;
-            font-size: 10px;
             color: white;
-            opacity: 0.3;
-            animation: twinkle 2s infinite;
+            opacity: 0.4;
+            font-size: 12px;
+            animation: twinkle 1.5s infinite ease-in-out;
         }
 
         @keyframes twinkle {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.8; }
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.7; }
+        }
+
+        .instructions {
+            font-size: 14px;
+            color: #ccc;
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
 
-<div class="game-container" id="gameContainer">
+<div class="game-container" id="gameContainer" tabindex="0">
     <div class="score-board">Score: <span id="score">0</span></div>
     <div class="lives" id="lives">❤️❤️❤️</div>
     
@@ -158,17 +180,24 @@
     <!-- Start Screen -->
     <div class="start-screen" id="startScreen">
         <h1>⭐ Catch the Stars</h1>
-        <p>Catch good items, avoid bad ones!</p>
-        <button class="btn" onclick="startGame()">Play Game ▶️</button>
-        <div class="instructions">⬅️ Left / Right Arrow keys to move</div>
+        <p style="color:#aaa;margin:5px;">Catch good items, avoid bad ones!</p>
+        <div style="font-size:30px;margin:10px;">⭐💎🌟 vs 💀💣🦴</div>
+        <button class="btn" onclick="startGame()">PLAY ▶️</button>
+        <p class="instructions">Use ← → arrows or buttons below</p>
     </div>
     
     <!-- Game Over Screen -->
     <div class="game-over-screen hidden" id="gameOverScreen">
         <h1>Game Over!</h1>
-        <p>Your final score:</p>
+        <p style="color:#aaa;">Final Score:</p>
         <div class="final-score" id="finalScore">0</div>
-        <button class="btn" onclick="startGame()">Play Again 🔄</button>
+        <button class="btn" onclick="startGame()">PLAY AGAIN 🔄</button>
+    </div>
+
+    <!-- On-screen controls -->
+    <div class="controls" id="controls">
+        <div class="control-btn" ontouchstart="moveLeft()" onmousedown="moveLeft()">⬅️</div>
+        <div class="control-btn" ontouchstart="moveRight()" onmousedown="moveRight()">➡️</div>
     </div>
 </div>
 
@@ -180,153 +209,168 @@
     const startScreen = document.getElementById('startScreen');
     const gameOverScreen = document.getElementById('gameOverScreen');
     const finalScoreDisplay = document.getElementById('finalScore');
+    const controlsDiv = document.getElementById('controls');
 
     let score = 0;
     let lives = 3;
+    let playerX = 154;
     let gameRunning = false;
-    let playerX = 180;
-    let fallingItems = [];
-    let itemId = 0;
+    let moveSpeed = 25;
+    let keys = {};
 
-    // Items: emoji + points (positive = good, negative = bad)
-    const items = [
-        { emoji: '⭐', points: 10 },
-        { emoji: '💎', points: 20 },
-        { emoji: '🌟', points: 15 },
-        { emoji: '🔮', points: 25 },
-        { emoji: '💀', points: -10 },
-        { emoji: '💣', points: -15 },
-        { emoji: '🦴', points: -10 },
-    ];
+    // Items: emoji + points
+    const goodItems = ['⭐', '💎', '🌟', '🔮', '🍀'];
+    const badItems = ['💀', '💣', '🦴', '👻'];
 
     // Create background stars
-    function createBackground() {
-        for (let i = 0; i < 30; i++) {
-            const star = document.createElement('div');
-            star.className = 'bg-star';
-            star.textContent = '✦';
-            star.style.left = Math.random() * 400 + 'px';
-            star.style.top = Math.random() * 500 + 'px';
-            star.style.animationDelay = Math.random() * 2 + 's';
-            gameContainer.appendChild(star);
-        }
+    for (let i = 0; i < 25; i++) {
+        const star = document.createElement('div');
+        star.className = 'bg-star';
+        star.textContent = '✦';
+        star.style.left = Math.random() * 340 + 'px';
+        star.style.top = Math.random() * 440 + 'px';
+        star.style.animationDelay = Math.random() * 1.5 + 's';
+        gameContainer.appendChild(star);
     }
 
-    createBackground();
+    // Hide controls initially
+    controlsDiv.classList.add('hidden');
 
-    // Keyboard controls
+    // Keyboard input
     document.addEventListener('keydown', (e) => {
-        if (!gameRunning) return;
-        
-        if (e.key === 'ArrowLeft' || e.key === 'a') {
-            playerX = Math.max(20, playerX - 30);
-        } else if (e.key === 'ArrowRight' || e.key === 'd') {
-            playerX = Math.min(340, playerX + 30);
-        }
-        player.style.left = playerX + 'px';
+        keys[e.key] = true;
     });
+
+    document.addEventListener('keyup', (e) => {
+        keys[e.key] = false;
+    });
+
+    // Game loop for movement
+    function gameLoop() {
+        if (!gameRunning) return;
+
+        if (keys['ArrowLeft'] || keys['a'] || keys['A']) {
+            playerX = Math.max(15, playerX - moveSpeed);
+        }
+        if (keys['ArrowRight'] || keys['d'] || keys['D']) {
+            playerX = Math.min(270, playerX + moveSpeed);
+        }
+        
+        player.style.left = playerX + 'px';
+        requestAnimationFrame(gameLoop);
+    }
+
+    // Button controls
+    function moveLeft() {
+        if (!gameRunning) return;
+        playerX = Math.max(15, playerX - moveSpeed);
+        player.style.left = playerX + 'px';
+    }
+
+    function moveRight() {
+        if (!gameRunning) return;
+        playerX = Math.min(270, playerX + moveSpeed);
+        player.style.left = playerX + 'px';
+    }
 
     // Start game
     function startGame() {
         score = 0;
         lives = 3;
-        playerX = 180;
+        playerX = 154;
         gameRunning = true;
-        
-        scoreDisplay.textContent = score;
+
+        scoreDisplay.textContent = '0';
         livesDisplay.textContent = '❤️❤️❤️';
-        player.style.left = playerX + 'px';
-        
+        player.style.left = '154px';
+
+        // Clear old items
+        document.querySelectorAll('.item').forEach(el => el.remove());
+
         startScreen.classList.add('hidden');
         gameOverScreen.classList.add('hidden');
-        
-        // Remove old items
-        document.querySelectorAll('.item').forEach(item => item.remove());
-        
-        // Start spawning items
+        controlsDiv.classList.remove('hidden');
+
+        // Start loops
+        gameLoop();
         spawnItem();
-        
-        // Schedule game over after 60 seconds
-        setTimeout(() => {
-            if (gameRunning) endGame();
-        }, 60000);
     }
 
-    // Spawn falling item
+    // Spawn items
     function spawnItem() {
         if (!gameRunning) return;
-        
-        const itemData = items[Math.floor(Math.random() * items.length)];
+
+        const isGood = Math.random() > 0.3;
+        const list = isGood ? goodItems : badItems;
+        const emoji = list[Math.floor(Math.random() * list.length)];
+        const points = isGood ? (emoji === '💎' ? 25 : emoji === '🔮' ? 20 : 10) : -10;
+
         const item = document.createElement('div');
         item.className = 'item';
-        item.textContent = itemData.emoji;
-        item.style.left = Math.random() * 360 + 20 + 'px';
-        item.style.animationDuration = (2 + Math.random() * 2) + 's';
+        item.textContent = emoji;
+        item.dataset.points = points;
+        item.style.left = Math.random() * 300 + 20 + 'px';
         
-        item.dataset.id = itemId++;
-        item.dataset.points = itemData.points;
+        const speed = 2.5 + Math.random() * 1.5;
+        item.style.transition = `top ${speed}s linear`;
         
         gameContainer.appendChild(item);
-        fallingItems.push(item);
         
-        // Remove item after animation
-        setTimeout(() => {
-            if (item.parentNode) {
-                item.remove();
-                fallingItems = fallingItems.filter(i => i !== item);
-            }
-        }, 4000);
-        
-        // Check collision every 50ms
-        const checkCollision = setInterval(() => {
+        // Trigger animation
+        setTimeout(() => item.style.top = '480px', 10);
+
+        // Collision check & removal
+        const checkInterval = setInterval(() => {
             if (!gameRunning || !item.parentNode) {
-                clearInterval(checkCollision);
+                clearInterval(checkInterval);
                 return;
             }
-            
+
             const itemRect = item.getBoundingClientRect();
             const playerRect = player.getBoundingClientRect();
-            
-            if (isColliding(itemRect, playerRect)) {
-                const points = parseInt(item.dataset.points);
-                score += points;
-                scoreDisplay.textContent = score;
+
+            if (itemRect.bottom >= playerRect.top && 
+                itemRect.top <= playerRect.bottom &&
+                itemRect.right >= playerRect.left && 
+                itemRect.left <= playerRect.right) {
                 
-                if (points < 0) {
+                const pts = parseInt(item.dataset.points);
+                score += pts;
+                scoreDisplay.textContent = score;
+
+                if (pts < 0) {
                     lives--;
                     updateLives();
                     if (lives <= 0) endGame();
                 }
-                
-                item.remove();
-                clearInterval(checkCollision);
-            }
-        }, 50);
-        
-        // Spawn next item (faster as score increases)
-        const spawnDelay = Math.max(500, 1500 - score * 5);
-        setTimeout(spawnItem, spawnDelay);
-    }
 
-    function isColliding(rect1, rect2) {
-        return !(rect1.right < rect2.left || 
-                 rect1.left > rect2.right || 
-                 rect1.bottom < rect2.top || 
-                 rect1.top > rect2.bottom);
+                item.remove();
+                clearInterval(checkInterval);
+            }
+
+            // Item fell off screen
+            if (itemRect.top > 480) {
+                item.remove();
+                clearInterval(checkInterval);
+            }
+        }, 30);
+
+        // Next spawn
+        const delay = Math.max(400, 1000 - score * 3);
+        setTimeout(spawnItem, delay);
     }
 
     function updateLives() {
-        let hearts = '';
-        for (let i = 0; i < lives; i++) hearts += '❤️';
-        livesDisplay.textContent = hearts;
+        livesDisplay.textContent = '❤️'.repeat(lives);
     }
 
     function endGame() {
         gameRunning = false;
+        controlsDiv.classList.add('hidden');
         finalScoreDisplay.textContent = score;
         gameOverScreen.classList.remove('hidden');
     }
 </script>
 
 </body>
-  </html>
+</html>
